@@ -4,7 +4,7 @@ import { auth } from "./firebase";
 /**
  * Chama a IA.
  * — Em produção (Netlify): usa a Function /ai, que guarda as chaves no servidor
- *   e escolhe o motor (Fable 5 para VIPs verificados, Gemini para os demais).
+ *   e escolhe o motor (Opus 5 para VIPs verificados, Gemini para os demais).
  * — Em desenvolvimento local: chama o Gemini direto com a VITE_GEMINI_API_KEY do .env.
  */
 async function callAI(prompt) {
@@ -17,7 +17,7 @@ async function callAI(prompt) {
     return result.response.text();
   }
 
-  // Token de login: o servidor verifica e decide o motor (VIP → Fable 5)
+  // Token de login: o servidor verifica e decide o motor (VIP → Opus 5)
   let idToken = null;
   try {
     idToken = (await auth.currentUser?.getIdToken()) || null;

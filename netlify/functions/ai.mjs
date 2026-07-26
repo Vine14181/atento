@@ -4,7 +4,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
  * Roteador de IA do Atento — mantém as chaves no servidor, fora do navegador.
  *
  * Motores:
- *  — VIPs (verificados pelo token do Firebase): Claude Fable 5 (Anthropic)
+ *  — VIPs (verificados pelo token do Firebase): Claude Opus 5 (Anthropic), raciocínio máximo
  *  — Todos os demais: Gemini (Google)
  *
  * Variáveis de ambiente no Netlify:
@@ -13,6 +13,13 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
  *  — FIREBASE_WEB_API_KEY  (para verificar o token de login; é a chave pública do Firebase)
  *  — VIP_EMAILS            (emails do motor VIP, separados por vírgula)
  */
+
+// Teto de tempo pro Opus 5 antes de desistir e cair no Gemini — a function do
+// Netlify tem um limite de execução (~10s no plano padrão). "Esforço máximo"
+// pode pensar por mais tempo que isso, e se a function inteira for encerrada
+// pela plataforma no meio do caminho, o fallback abaixo nunca roda. Por isso
+// abortamos a chamada por conta própria um pouco antes do limite da plataforma.
+const OPUS_TIMEOUT_MS = 8000;
 
 // Emails com acesso ao motor VIP — configurados no ambiente (VIP_EMAILS,
 // separados por vírgula), nunca no código. Vazio = todos usam o Gemini.
@@ -44,24 +51,35 @@ async function getVerifiedEmail(idToken) {
   }
 }
 
-// Claude Fable 5 via API da Anthropic (fetch puro, sem SDK).
-// effort "low" mantém a resposta dentro do limite de tempo da function
-// (no Fable 5, effort baixo ainda rende acima do máximo de modelos anteriores).
-async function callFable(prompt, key) {
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "x-api-key": key,
-      "anthropic-version": "2023-06-01",
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "claude-fable-5",
-      max_tokens: 4096,
-      output_config: { effort: "low" },
-      messages: [{ role: "user", content: prompt }],
-    }),
-  });
+// Claude Opus 5 via API da Anthropic (fetch puro, sem SDK), com raciocínio no
+// esforço máximo. Aborta sozinho depois de OPUS_TIMEOUT_MS para não deixar a
+// plataforma matar a function inteira (o que puparia o fallback do Gemini).
+async function callOpus5(prompt, key) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), OPUS_TIMEOUT_MS);
+  let res;
+  try {
+    res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "x-api-key": key,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "claude-opus-5",
+        max_tokens: 8000,
+        output_config: { effort: "max" },
+        messages: [{ role: "user", content: prompt }],
+      }),
+      signal: controller.signal,
+    });
+  } catch (err) {
+    if (err.name === "AbortError") throw new Error("tempo esgotado");
+    throw err;
+  } finally {
+    clearTimeout(timeout);
+  }
   if (!res.ok) {
     throw new Error(`Anthropic retornou ${res.status}`);
   }
@@ -104,16 +122,16 @@ export default async (req) => {
   const geminiKey = process.env.GEMINI_API_KEY;
   const anthropicKey = process.env.ANTHROPIC_API_KEY;
 
-  // Motor VIP: Claude Fable 5, só para emails verificados
+  // Motor VIP: Claude Opus 5 (raciocínio máximo), só para emails verificados
   if (anthropicKey) {
     const email = await getVerifiedEmail(idToken);
     if (email && VIP_EMAILS.includes(email)) {
       try {
-        const text = await callFable(prompt, anthropicKey);
-        return Response.json({ text, engine: "fable-5" });
+        const text = await callOpus5(prompt, anthropicKey);
+        return Response.json({ text, engine: "opus-5" });
       } catch (err) {
-        // Recusa, limite de taxa ou erro: cai para o Gemini em vez de falhar
-        console.error("Fable 5 falhou, usando Gemini:", err.message);
+        // Recusa, limite de taxa, tempo esgotado ou erro: cai para o Gemini em vez de falhar
+        console.error("Opus 5 falhou, usando Gemini:", err.message);
       }
     }
   }

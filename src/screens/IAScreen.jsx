@@ -178,7 +178,7 @@ export default function IAScreen({ pendingTasks, energy, onAddTask, onAddAlarm, 
             Atento {vip && <span style={{ fontSize: 11, color: 'var(--primary)', fontWeight: 700 }}>✨ VIP</span>}
           </div>
           <div style={{ fontSize: 11, color: 'var(--fg-muted)' }}>
-            {vip ? 'Motor Fable 5 · o mais inteligente' : 'Seu co-piloto IA para TDAH'}
+            {vip ? 'Motor Opus 5 · raciocínio máximo' : 'Seu co-piloto IA para TDAH'}
           </div>
         </div>
         {showChat && (

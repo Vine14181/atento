@@ -143,7 +143,7 @@ export default function PerfilScreen({ tasks, doneTasks, habits, profile }) {
             borderRadius: 99, padding: '3px 14px', fontSize: 12, fontWeight: 700,
             border: '1px solid hsla(189,94%,55%,0.4)',
           }}>
-            ✨ VIP — IA Fable 5
+            ✨ VIP — IA Opus 5
           </span>
         )}
         <div style={{
