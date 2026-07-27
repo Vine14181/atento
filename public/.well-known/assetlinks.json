@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.atento.app",
+      "sha256_cert_fingerprints": [
+        "6B:EF:B8:30:2F:AF:7E:C2:D8:37:91:C8:BF:88:EE:2F:C5:E0:4E:73:25:F0:46:DC:1B:36:3E:D3:D6:9B:57:82"
+      ]
+    }
+  }
+]
