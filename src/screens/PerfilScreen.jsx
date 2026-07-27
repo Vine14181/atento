@@ -4,7 +4,6 @@ import { connectCalendar } from '../services/calendar';
 import { useAuth } from '../contexts/AuthContext';
 import EnergyProfileSheet from '../components/EnergyProfileSheet';
 import { updateProfile, clearAllTasks } from '../services/firestore';
-import { isVip } from '../utils/vip';
 import { todayStr, WEEKDAY_LABELS } from '../utils/dates';
 import { globalStreak, currentWeekScores, monthAverage } from '../utils/scoring';
 import { buildInsights } from '../utils/insights';
@@ -15,7 +14,7 @@ import { ACHIEVEMENTS, CATEGORIES, CAT_EMOJI } from '../utils/achievements';
 const FEEDBACK_EMAIL = import.meta.env.VITE_FEEDBACK_EMAIL || '';
 
 export default function PerfilScreen({ tasks, doneTasks, habits, profile }) {
-  const { currentUser, logout } = useAuth();
+  const { currentUser, logout, isVip } = useAuth();
   const [energyOpen, setEnergyOpen] = useState(false);
   const [wheelView, setWheelView] = useState('semana');
   const [installEvent, setInstallEvent] = useState(null);
@@ -137,7 +136,7 @@ export default function PerfilScreen({ tasks, doneTasks, habits, profile }) {
           <div style={{ fontWeight: 800, fontSize: 20 }}>{displayName}</div>
           {email && <div style={{ color: 'var(--fg-muted)', fontSize: 13 }}>{email}</div>}
         </div>
-        {isVip(email) && (
+        {isVip && (
           <span style={{
             background: 'var(--primary-dark)', color: 'var(--primary)',
             borderRadius: 99, padding: '3px 14px', fontSize: 12, fontWeight: 700,

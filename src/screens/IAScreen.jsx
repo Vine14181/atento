@@ -7,7 +7,6 @@ import {
 import confetti from 'canvas-confetti';
 import { chatWithAtento, transcribeAudio } from '../gemini';
 import { useAuth } from '../contexts/AuthContext';
-import { isVip } from '../utils/vip';
 
 const QUICK_ACTIONS = [
   { id: 'task',    icon: <CheckSquare size={18} />, label: 'Cadastrar tarefa' },
@@ -32,8 +31,7 @@ const hasMic =
 const RECORDER_MIME_TYPES = ['audio/webm', 'audio/mp4', 'audio/ogg'];
 
 export default function IAScreen({ pendingTasks, energy, onAddTask, onAddAlarm, onCircuitBreaker }) {
-  const { currentUser } = useAuth();
-  const vip = isVip(currentUser?.email);
+  const { isVip: vip } = useAuth();
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);

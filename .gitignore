@@ -44,8 +44,12 @@ dist-ssr
 *.sln
 *.sw?
 
-# Local Netlify folder
+# Pastas locais das hospedagens (guardam ids de projeto/conta)
 .netlify
+.vercel
 
 # Perfil de navegador com sessão do AIBro (nunca commitar)
 .aibro-profile/
+
+.vercel
+.env*

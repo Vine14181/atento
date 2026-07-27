@@ -1,9 +1,40 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { auth } from "./firebase";
 
+// Token de login. O servidor exige ele em todas as chamadas de IA (impede que
+// alguém use as funções como proxy grátis) e é ele que define quem é VIP.
+async function getIdToken() {
+  try {
+    return (await auth.currentUser?.getIdToken()) || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Pergunta ao servidor se o usuário logado tem o motor VIP.
+ * A lista de emails VIP fica só no servidor — assim não vai para o
+ * JavaScript público do site.
+ */
+export async function fetchVipStatus() {
+  if (import.meta.env.DEV) return false;
+  try {
+    const res = await fetch("/api/me", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idToken: await getIdToken() }),
+    });
+    if (!res.ok) return false;
+    const data = await res.json();
+    return data.vip === true;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Chama a IA.
- * — Em produção (Netlify): usa a Function /ai, que guarda as chaves no servidor
+ * — Em produção (Vercel): usa a função /api/ai, que guarda as chaves no servidor
  *   e escolhe o motor (Opus 5 para VIPs verificados, Gemini para os demais).
  * — Em desenvolvimento local: chama o Gemini direto com a VITE_GEMINI_API_KEY do .env.
  */
@@ -17,15 +48,9 @@ async function callAI(prompt) {
     return result.response.text();
   }
 
-  // Token de login: o servidor verifica e decide o motor (VIP → Opus 5)
-  let idToken = null;
-  try {
-    idToken = (await auth.currentUser?.getIdToken()) || null;
-  } catch {
-    // segue sem token — o servidor usa o Gemini
-  }
+  const idToken = await getIdToken();
 
-  const res = await fetch("/.netlify/functions/ai", {
+  const res = await fetch("/api/ai", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ prompt, idToken }),
@@ -40,7 +65,7 @@ async function callAI(prompt) {
 /**
  * Transcreve um áudio de voz usando o Gemini (mesmo motor multimodal do
  * app oficial do Gemini) — muito mais preciso que a Web Speech API do navegador.
- * — Produção: Netlify Function /transcribe (chave protegida no servidor).
+ * — Produção: função /api/transcribe (chave protegida no servidor).
  * — Dev local: chama o Gemini direto com a VITE_GEMINI_API_KEY.
  * Recebe um Blob de áudio e retorna a string transcrita (pode ser "").
  */
@@ -65,10 +90,14 @@ export async function transcribeAudio(audioBlob) {
     return result.response.text().trim();
   }
 
-  const res = await fetch("/.netlify/functions/transcribe", {
+  const res = await fetch("/api/transcribe", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ audioBase64, mimeType }),
+    body: JSON.stringify({
+      audioBase64,
+      mimeType,
+      idToken: await getIdToken(),
+    }),
   });
   if (!res.ok) {
     throw new Error(`Função de transcrição retornou ${res.status}`);
