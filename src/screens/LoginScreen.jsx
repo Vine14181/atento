@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Zap, Loader2 } from 'lucide-react';
+import { Zap, Loader2, Download } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
 
@@ -79,14 +79,34 @@ export default function LoginScreen() {
           </div>
         )}
 
-        <button 
-          className="btn-primary" 
+        <button
+          className="btn-primary"
           onClick={handleLogin}
           disabled={loading}
           style={{ width: '100%', padding: '16px', fontSize: '16px', display: 'flex', justifyContent: 'center' }}
         >
           {loading ? <Loader2 className="animate-spin" /> : 'Entrar com Google'}
         </button>
+
+        {/* Baixar o app para Android (APK) */}
+        <a
+          href="/atento.apk"
+          download="Atento.apk"
+          className="btn-outline-primary"
+          style={{
+            width: '100%', marginTop: 14, padding: '14px', fontSize: 15,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            textDecoration: 'none',
+          }}
+        >
+          <Download size={18} />
+          Baixar o app (Android)
+        </a>
+        <p style={{ color: 'var(--fg-dim)', fontSize: 12, marginTop: 10, lineHeight: 1.5 }}>
+          No celular, ao abrir o arquivo baixado o Android pede para permitir
+          “instalar de fontes desconhecidas”. Se já tinha uma versão antiga,
+          desinstale antes de instalar esta.
+        </p>
       </motion.div>
     </div>
   );
