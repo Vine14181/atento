@@ -3,6 +3,19 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
+      "package_name": "atento.vgp",
+      "sha256_cert_fingerprints": [
+        "F2:94:B6:2C:E7:F5:E9:7C:CB:E1:F5:15:90:B1:44:E9:8D:9D:3A:04:13:62:C9:5D:2D:64:C2:FC:5E:BF:79:67",
+        "1A:ED:A1:B0:87:1F:5C:FE:55:AF:50:28:43:B6:83:0B:B2:CB:BF:E7:7E:54:0D:6E:60:80:CA:18:7C:96:10:1A",
+        "52:FB:2E:AC:CA:07:C9:36:EB:56:6F:62:6D:BF:EC:E1:46:85:17:23:19:8B:67:D5:8A:2F:E4:AC:99:E9:02:6C",
+        "51:88:FD:8D:FC:B7:59:2F:57:A8:0F:48:A7:78:F1:9B:29:EE:AD:7F:BC:F0:08:0D:FD:76:CA:66:93:DB:97:63"
+      ]
+    }
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
       "package_name": "com.atento.app",
       "sha256_cert_fingerprints": [
         "6B:EF:B8:30:2F:AF:7E:C2:D8:37:91:C8:BF:88:EE:2F:C5:E0:4E:73:25:F0:46:DC:1B:36:3E:D3:D6:9B:57:82"

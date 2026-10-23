@@ -79,9 +79,7 @@ export const removeTask = async (uid, taskId) => {
 export const clearAllTasks = async (uid) => {
   if (!uid) return;
   const snap = await getDocs(collection(db, `users/${uid}/tasks`));
-  const batch = writeBatch(db);
-  snap.docs.forEach(d => batch.delete(d.ref));
-  await batch.commit();
+  await deleteDocsInBatches(snap.docs);
 };
 
 /* ===================== HÁBITOS ===================== */
@@ -206,4 +204,47 @@ export const saveRamCache = async (uid, content) => {
     content,
     updatedAt: new Date().toISOString()
   });
+};
+
+/* ===================== DENÚNCIAS DE RESPOSTAS DA IA ===================== */
+
+// A política de conteúdo gerado por IA da Google Play exige que a pessoa
+// consiga denunciar uma resposta sem sair do app. A denúncia fica na pasta do
+// próprio usuário (as regras do Firestore já permitem) e o desenvolvedor lê no
+// console do Firebase com uma consulta ao grupo de coleções "aiReports".
+export const addAiReport = async (uid, report) => {
+  if (!uid) return;
+  const reportId = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  await setDoc(doc(db, `users/${uid}/aiReports`, reportId), {
+    ...report,
+    uid,
+    createdAt: new Date().toISOString(),
+  });
+};
+
+/* ===================== CONTA (exclusão de conta e dados) ===================== */
+
+// Lista ÚNICA das subcoleções do usuário. Coleção nova TEM que entrar aqui:
+// o SDK do Firestore no navegador não consegue listar subcoleções, então o que
+// ficar fora desta lista sobra no banco quando a pessoa exclui a conta.
+export const USER_COLLECTIONS = ['tasks', 'habits', 'alarms', 'profile', 'ram', 'aiReports'];
+
+export const listUserDocs = async (uid) => {
+  if (!uid) return [];
+  const all = [];
+  for (const name of USER_COLLECTIONS) {
+    const snap = await getDocs(collection(db, `users/${uid}/${name}`));
+    all.push(...snap.docs);
+  }
+  return all;
+};
+
+// Um lote do Firestore aceita no máximo 500 operações; 400 deixa folga.
+export const deleteDocsInBatches = async (docs, onProgress) => {
+  for (let i = 0; i < docs.length; i += 400) {
+    const batch = writeBatch(db);
+    docs.slice(i, i + 400).forEach(d => batch.delete(d.ref));
+    await batch.commit();
+    onProgress?.(Math.min(i + 400, docs.length), docs.length);
+  }
 };

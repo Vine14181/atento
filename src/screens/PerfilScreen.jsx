@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { LogOut, Zap, Download, MessageCircle, Trash2, Flame, CalendarCheck } from 'lucide-react';
+import { LogOut, Zap, Download, MessageCircle, Trash2, Flame, CalendarCheck, ShieldCheck, UserX } from 'lucide-react';
 import { connectCalendar } from '../services/calendar';
 import { useAuth } from '../contexts/AuthContext';
 import EnergyProfileSheet from '../components/EnergyProfileSheet';
+import DeleteAccountSheet from '../components/DeleteAccountSheet';
 import { updateProfile, clearAllTasks } from '../services/firestore';
 import { todayStr, WEEKDAY_LABELS } from '../utils/dates';
 import { globalStreak, currentWeekScores, monthAverage } from '../utils/scoring';
@@ -16,6 +17,7 @@ const FEEDBACK_EMAIL = import.meta.env.VITE_FEEDBACK_EMAIL || '';
 export default function PerfilScreen({ tasks, doneTasks, habits, profile }) {
   const { currentUser, logout, isVip } = useAuth();
   const [energyOpen, setEnergyOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const [wheelView, setWheelView] = useState('semana');
   const [installEvent, setInstallEvent] = useState(null);
 
@@ -48,6 +50,10 @@ export default function PerfilScreen({ tasks, doneTasks, habits, profile }) {
     : 0;
   const focusMinutes = doneTasks.reduce((sum, t) => sum + (t.durationMin || 30), 0);
   const focusH = Math.floor(focusMinutes / 60);
+
+  // A opção de apagar eventos da agenda só aparece para quem usou a agenda
+  const hasCalendar = !!profile?.gcalEnabled
+    || [...tasks, ...doneTasks].some(t => t.gcalEventId);
 
   const insights = buildInsights({ tasks: [...tasks, ...doneTasks], doneTasks, habits, profile });
   const unlocked = profile?.achievements || {};
@@ -316,6 +322,13 @@ export default function PerfilScreen({ tasks, doneTasks, habits, profile }) {
       />
 
       <MenuRow
+        icon={<ShieldCheck size={18} />}
+        title="Política de privacidade"
+        desc="Quais dados o app usa e como pedir a exclusão"
+        onClick={() => window.open('/privacidade.html', '_blank', 'noopener')}
+      />
+
+      <MenuRow
         icon={<LogOut size={18} />}
         iconBg="rgba(239,68,68,0.12)"
         iconColor="#ef4444"
@@ -324,7 +337,30 @@ export default function PerfilScreen({ tasks, doneTasks, habits, profile }) {
         onClick={handleLogout}
       />
 
+      <MenuRow
+        icon={<UserX size={18} />}
+        iconBg="rgba(239,68,68,0.12)"
+        iconColor="#ef4444"
+        title="Excluir conta e dados"
+        desc="Apaga sua conta e tudo o que você salvou no app"
+        onClick={() => setDeleteOpen(true)}
+      />
+
+      {/* Exigência da política de saúde da Google Play: o app precisa lembrar,
+          dentro dele, que não substitui um profissional */}
+      <p style={{ color: 'var(--fg-dim)', fontSize: 12, lineHeight: 1.6, textAlign: 'center', margin: '8px 4px 0' }}>
+        Este app é uma ferramenta de organização pessoal. Não é um dispositivo
+        médico e não diagnostica nem trata o TDAH ou qualquer outra condição.
+        Para orientação, procure um profissional de saúde.
+      </p>
+
       <div style={{ height: 16 }} />
+
+      <DeleteAccountSheet
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        hasCalendar={hasCalendar}
+      />
 
       <EnergyProfileSheet
         open={energyOpen}

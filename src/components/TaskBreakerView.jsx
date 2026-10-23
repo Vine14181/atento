@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Zap, Circle, CheckCircle2, Loader2 } from 'lucide-react';
+import { ArrowLeft, Zap, Circle, CheckCircle2, Loader2, Flag } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { breakDownTask } from '../gemini';
+import ReportAiSheet from './ReportAiSheet';
 
 /**
  * TaskBreakerView — O Descomplicador
@@ -23,6 +24,7 @@ export default function TaskBreakerView({ task, onComplete, onClose }) {
   const [steps, setSteps] = useState(initialSteps);
   const [isBreaking, setIsBreaking] = useState(false);
   const [hasStarted, setHasStarted] = useState(initialSteps.length > 0);
+  const [reportOpen, setReportOpen] = useState(false);
 
   const handleBreakDown = async () => {
     setIsBreaking(true);
@@ -235,9 +237,28 @@ export default function TaskBreakerView({ task, onComplete, onClose }) {
                 </motion.div>
               )}
             </AnimatePresence>
+
+            {/* Os passos foram gerados pela IA: a pessoa pode denunciá-los sem sair do app */}
+            <button
+              onClick={() => setReportOpen(true)}
+              aria-label="Denunciar os passos gerados pela IA"
+              style={{
+                display: 'flex', alignItems: 'center', gap: 4, alignSelf: 'center',
+                marginTop: 8, padding: '6px 8px', fontSize: 12, color: 'var(--fg-dim)',
+              }}
+            >
+              <Flag size={12} /> Denunciar estes passos
+            </button>
           </div>
         )}
       </div>
+
+      <ReportAiSheet
+        open={reportOpen}
+        onClose={() => setReportOpen(false)}
+        feature="descomplicador"
+        aiText={`Tarefa: ${task.text}\n${steps.map(s => `- ${s.text}`).join('\n')}`}
+      />
     </motion.div>
   );
 }

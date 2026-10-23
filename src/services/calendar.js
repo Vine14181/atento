@@ -1,4 +1,4 @@
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { GoogleAuthProvider, reauthenticateWithPopup, signInWithPopup } from 'firebase/auth';
 import { auth } from '../firebase';
 import { addDays } from '../utils/dates';
 
@@ -10,14 +10,17 @@ import { addDays } from '../utils/dates';
  */
 
 const TOKEN_KEY = 'atento_gcal_token';
-const SCOPE = 'https://www.googleapis.com/auth/calendar.events';
+export const CALENDAR_SCOPE = 'https://www.googleapis.com/auth/calendar.events';
 
 const getStoredToken = () => {
   try {
     const raw = localStorage.getItem(TOKEN_KEY);
     if (!raw) return null;
-    const { token, exp } = JSON.parse(raw);
+    const { token, exp, uid } = JSON.parse(raw);
     if (!token || Date.now() > exp) return null;
+    // O token é de UMA conta Google: se outra pessoa entrar no mesmo aparelho,
+    // os eventos dela não podem cair na agenda de quem entrou antes.
+    if (uid !== auth.currentUser?.uid) return null;
     return token;
   } catch {
     return null;
@@ -26,14 +29,25 @@ const getStoredToken = () => {
 
 const storeToken = (token) => {
   // Tokens OAuth do Google duram ~1h; guardamos com folga de segurança
-  localStorage.setItem(TOKEN_KEY, JSON.stringify({ token, exp: Date.now() + 55 * 60 * 1000 }));
+  localStorage.setItem(TOKEN_KEY, JSON.stringify({
+    token,
+    exp: Date.now() + 55 * 60 * 1000,
+    uid: auth.currentUser?.uid || null,
+  }));
 };
 
 // Abre o popup do Google pedindo o escopo de agenda e captura o access token
 export const connectCalendar = async () => {
   const provider = new GoogleAuthProvider();
-  provider.addScope(SCOPE);
-  const result = await signInWithPopup(auth, provider);
+  provider.addScope(CALENDAR_SCOPE);
+  const user = auth.currentUser;
+  // Com alguém logado, "reautenticar" em vez de "entrar": se a pessoa escolher
+  // outra conta no popup, o Firebase recusa (auth/user-mismatch) em vez de
+  // trocar o usuário do app sem avisar.
+  if (user?.email) provider.setCustomParameters({ login_hint: user.email });
+  const result = user
+    ? await reauthenticateWithPopup(user, provider)
+    : await signInWithPopup(auth, provider);
   const cred = GoogleAuthProvider.credentialFromResult(result);
   if (!cred?.accessToken) throw new Error('Sem token de acesso');
   storeToken(cred.accessToken);

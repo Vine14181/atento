@@ -14,6 +14,7 @@ import LoginScreen from './screens/LoginScreen';
 import RAMCache from './components/RAMCache';
 import TaskBreakerView from './components/TaskBreakerView';
 import AlarmOverlay from './components/AlarmOverlay';
+import DeletionScreen from './components/DeletionScreen';
 import { useAuth } from './contexts/AuthContext';
 import {
   subscribeToTasks, subscribeToHabits, subscribeToProfile, subscribeToAlarms,
@@ -36,7 +37,9 @@ const TABS = [
 ];
 
 export default function App() {
-  const { currentUser } = useAuth();
+  const { currentUser, deletion } = useAuth();
+  // Durante a exclusão de conta, nada pode ler nem gravar no Firestore
+  const paused = !!deletion;
 
   /* ======= ESTADO GLOBAL ======= */
   const [activeTab, setActiveTab] = useState('ia');
@@ -55,10 +58,11 @@ export default function App() {
 
   /* ======= FIRESTORE SYNC ======= */
   useEffect(() => {
-    if (!currentUser) {
+    if (!currentUser || paused) {
       setTasks([]);
       setHabits([]);
       setProfile({});
+      setAlarms([]);
       return;
     }
     const unsubTasks = subscribeToTasks(currentUser.uid, setTasks);
@@ -71,11 +75,11 @@ export default function App() {
       unsubProfile();
       unsubAlarms();
     };
-  }, [currentUser]);
+  }, [currentUser, paused]);
 
   /* ======= WATCHER DE ALARMES: dispara na hora certa ======= */
   useEffect(() => {
-    if (!currentUser) return;
+    if (!currentUser || paused) return;
     const check = () => {
       if (ringingAlarm) return; // já tem um tocando
       const now = new Date();
@@ -85,7 +89,7 @@ export default function App() {
     check();
     const interval = setInterval(check, 15000);
     return () => clearInterval(interval);
-  }, [alarms, ringingAlarm, currentUser]);
+  }, [alarms, ringingAlarm, currentUser, paused]);
 
   const stopAlarm = async () => {
     if (!currentUser || !ringingAlarm) return;
@@ -107,7 +111,7 @@ export default function App() {
 
   /* ======= CONQUISTAS: avalia a cada mudança de dados ======= */
   useEffect(() => {
-    if (!currentUser || evaluatingRef.current) return;
+    if (!currentUser || paused || evaluatingRef.current) return;
     const week7 = consistency7(habits).map(d => d.score);
     const { unlockedNow, all } = evaluateAchievements(
       { tasks, doneTasks, habits, profile, week7 },
@@ -127,7 +131,7 @@ export default function App() {
       setTimeout(() => setAchToast(null), 4000);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tasks, habits, profile, currentUser]);
+  }, [tasks, habits, profile, currentUser, paused]);
 
   /* ======= CALLBACKS DE TAREFAS ======= */
   // Tarefa rica (vinda do chat da IA ou do formulário completo)
@@ -289,6 +293,12 @@ export default function App() {
         );
     }
   };
+
+  // Exclusão de conta em andamento: só a tela de progresso fica montada.
+  // Vem antes do login porque, no fim da exclusão, currentUser vira null.
+  if (deletion) {
+    return <DeletionScreen />;
+  }
 
   // Se não estiver logado, mostra apenas a tela de login
   if (!currentUser) {

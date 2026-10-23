@@ -31,7 +31,7 @@ export default function EnergyProfileSheet({ open, onClose, initial, onSave }) {
       open={open}
       onClose={onClose}
       title="⚡ Perfil de Energia"
-      subtitle="Responda para personalizar sua experiência"
+      subtitle="Opcional. As respostas ficam na sua conta e servem só para personalizar as dicas da IA."
       footer={
         <button className="btn-primary" onClick={handleSave} disabled={!complete} style={{ width: '100%', opacity: complete ? 1 : 0.5 }}>
           Salvar perfil de energia

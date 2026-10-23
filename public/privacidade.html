@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#060a0e">
+<title>Política de Privacidade — OFtento (Atento)</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #060a0e; color: #eef4f7;
+    font: 16px/1.65 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 760px; margin: 0 auto; padding: 32px 20px 64px; }
+  h1 { font-size: 1.9rem; line-height: 1.2; margin: 0 0 8px; }
+  h2 { font-size: 1.25rem; margin: 36px 0 10px; color: #22d3ee; }
+  p, li { color: #c9d5dc; }
+  a { color: #22d3ee; }
+  .meta { color: #8b9aa3; font-size: .95rem; }
+  .box { border: 1px solid rgba(34, 211, 238, .35); background: rgba(34, 211, 238, .06);
+         border-radius: 14px; padding: 14px 18px; margin: 18px 0; }
+  .warn { border-color: rgba(234, 179, 8, .45); background: rgba(234, 179, 8, .07); }
+  .table-wrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: .95rem; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 8px; border-bottom: 1px solid rgba(255, 255, 255, .09); }
+  th { color: #eef4f7; }
+  td { color: #c9d5dc; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Política de Privacidade — OFtento</h1>
+  <p class="meta">
+    App Android <strong>OFtento</strong> (Google Play) e site <strong>Atento</strong>
+    (<a href="https://atento-tan.vercel.app">atento-tan.vercel.app</a>) — os dois são o mesmo serviço.<br>
+    Última atualização: 22 de outubro de 2026.<br>
+    Responsável (controlador dos dados): <strong>Vinicius Vaz</strong> — contato:
+    <a href="mailto:viniciusgabriel109@gmail.com">viniciusgabriel109@gmail.com</a>
+  </p>
+
+  <div class="box">
+    <strong>Resumo:</strong> você entra com a sua conta Google; o que você salva fica guardado na sua conta,
+    isolado das outras pessoas. Para organizar o que você escreve ou fala, o texto e o áudio do ditado
+    são enviados a serviços de inteligência artificial. Não há anúncios nem ferramentas de análise de uso,
+    e você pode excluir a conta e todos os dados dentro do app, em <strong>Perfil → Excluir conta e dados</strong>.
+  </div>
+
+  <h2>1. O que é o OFtento</h2>
+  <p>
+    O OFtento é uma ferramenta de organização pessoal com inteligência artificial, pensada para pessoas com TDAH:
+    transforma o que você escreve ou fala em tarefas com micro-passos, alarmes e hábitos.
+    <strong>Não é um dispositivo médico</strong> e não diagnostica, não trata, não cura nem previne nenhuma condição,
+    incluindo o TDAH. Para orientação, procure um profissional de saúde.
+  </p>
+
+  <h2>2. Dados que tratamos</h2>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Dado</th><th>Para quê</th><th>Onde fica</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Nome, e-mail, foto do perfil e identificador da sua conta Google</td>
+        <td>Entrar no app e identificar a sua conta; a foto e o nome aparecem no seu Perfil</td>
+        <td>Firebase Authentication (Google)</td>
+      </tr>
+      <tr>
+        <td>Tarefas (título, emoji, prioridade, data, hora, duração e micro-passos), hábitos e o histórico de dias
+          cumpridos, alarmes, o texto da “Memória RAM”, conquistas e contadores de uso (por exemplo, quantas vezes
+          você usou o Descomplicador)</td>
+        <td>Fazer o app funcionar e sincronizar entre os seus aparelhos</td>
+        <td>Cloud Firestore (Google), numa área que só a sua conta acessa</td>
+      </tr>
+      <tr>
+        <td>Perfil de energia (<strong>opcional</strong>): horário de mais produtividade, café por dia,
+          qualidade do sono, frequência de exercício, maior desafio, como lida com interrupções,
+          preferência de música e tempo de foco</td>
+        <td>Personalizar as sugestões da IA. Sono, exercício e café podem ser considerados dados de saúde:
+          você só os informa se quiser, e pode apagá-los excluindo a conta</td>
+        <td>Cloud Firestore (Google)</td>
+      </tr>
+      <tr>
+        <td>Conversa com a IA: o que você digita ou dita, junto com o contexto que a IA precisa
+          (as respostas do perfil de energia, até 10 títulos de tarefas pendentes e as últimas mensagens da conversa)</td>
+        <td>Separar o que é tarefa, nota e alarme e sugerir micro-passos</td>
+        <td>Enviada ao nosso servidor (Vercel) e dele ao Google Gemini; em contas VIP, à Anthropic (Claude), com o
+          Gemini como reserva. <strong>A conversa não é salva pelo app</strong>: some quando você fecha o chat. Só
+          vira dado salvo o que você tocar em “Adicionar” ou “Criar alarme”</td>
+      </tr>
+      <tr>
+        <td>Título da tarefa no Descomplicador</td>
+        <td>Gerar de 3 a 5 micro-passos</td>
+        <td>Enviado ao servidor e à IA, como na conversa</td>
+      </tr>
+      <tr>
+        <td>Áudio do ditado por voz (só quando você toca no microfone)</td>
+        <td>Transcrever o que você falou para texto</td>
+        <td>Enviado ao servidor e ao Google Gemini só para a transcrição. <strong>O app não guarda o áudio</strong></td>
+      </tr>
+      <tr>
+        <td>Google Agenda (<strong>opcional</strong>, só se você conectar)</td>
+        <td>Criar eventos com lembrete para tarefas com data e para alarmes. O app só <strong>cria</strong> eventos e
+          apaga os que <strong>ele mesmo</strong> criou; <strong>nunca lê</strong> os seus outros compromissos</td>
+        <td>API do Google Agenda. A autorização temporária (cerca de 55 minutos) fica só no seu aparelho</td>
+      </tr>
+      <tr>
+        <td>Denúncias de respostas da IA: motivo, comentário opcional e o texto denunciado</td>
+        <td>Analisar e corrigir respostas impróprias da IA</td>
+        <td>Cloud Firestore (Google), na sua conta</td>
+      </tr>
+      <tr>
+        <td>Dados técnicos de acesso: endereço IP, data e hora, navegador e endereços acessados</td>
+        <td>Funcionamento e segurança do serviço</td>
+        <td>Registros da Vercel (hospedagem) e do Google (Firebase). As fontes de letra do app vêm do Google Fonts,
+          que também recebe IP e navegador</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2>3. Bases legais (LGPD)</h2>
+  <p>
+    Tratamos os dados para executar o serviço que você pediu ao criar a conta (art. 7º, V), por legítimo interesse
+    na segurança do serviço (art. 7º, IX) e com o seu consentimento para os recursos opcionais: perfil de energia,
+    microfone e Google Agenda (arts. 7º, I, e 11, I). Você pode retirar o consentimento a qualquer momento,
+    deixando de usar o recurso ou excluindo a conta.
+  </p>
+
+  <h2>4. O que não fazemos</h2>
+  <ul>
+    <li>Não vendemos seus dados e não os usamos para publicidade.</li>
+    <li>Não exibimos anúncios e não usamos ferramentas de análise de uso ou de marketing.</li>
+    <li>Não lemos a sua Google Agenda.</li>
+  </ul>
+  <p>
+    O próprio SDK do Firebase envia ao Google informações técnicas de funcionamento (por exemplo, as versões das
+    bibliotecas), sem conteúdo seu.
+  </p>
+
+  <h2>5. Serviços que tratam dados para o OFtento</h2>
+  <ul>
+    <li><strong>Google</strong>: Firebase Authentication, Cloud Firestore, Gemini API (IA e transcrição),
+      Google Agenda e Google Fonts.</li>
+    <li><strong>Anthropic</strong>: modelo Claude, somente para contas VIP.</li>
+    <li><strong>Vercel</strong>: hospedagem do site e do servidor que conversa com a IA.</li>
+  </ul>
+  <div class="box warn">
+    <strong>Importante sobre a IA:</strong> hoje a IA principal (Google Gemini) é usada no
+    <strong>plano gratuito</strong> da API. Nesse plano, os termos do Google permitem que o Google use o conteúdo
+    enviado (texto e áudio) para melhorar os produtos dele, e revisores humanos podem ler esse conteúdo.
+    Por isso, <strong>não coloque no app informações sensíveis</strong>, como documentos, senhas, dados bancários
+    ou detalhes de saúde, nem dados que identifiquem outras pessoas.
+  </div>
+  <p>
+    Esses serviços podem processar dados fora do Brasil, por exemplo nos Estados Unidos, conforme os termos e as
+    salvaguardas de cada um (LGPD, art. 33).
+  </p>
+
+  <h2>6. Dados guardados no seu aparelho</h2>
+  <p>
+    O app guarda no aparelho a sua sessão de login (Firebase), a autorização temporária da Google Agenda, uma
+    cópia do texto da Memória RAM e os arquivos do próprio app (para abrir mais rápido). Ao sair da conta, a
+    autorização da agenda e a cópia da Memória RAM são apagadas do aparelho.
+  </p>
+
+  <h2>7. Por quanto tempo guardamos e como excluir</h2>
+  <p>
+    Os seus dados ficam guardados enquanto a sua conta existir. Para excluir a conta e todos os dados:
+  </p>
+  <ul>
+    <li><strong>No app:</strong> Perfil → <strong>Excluir conta e dados</strong>. A exclusão é imediata.</li>
+    <li><strong>Sem acesso ao app:</strong> envie um e-mail para
+      <a href="mailto:viniciusgabriel109@gmail.com?subject=Excluir%20conta%20OFtento">viniciusgabriel109@gmail.com</a>
+      com o assunto “Excluir conta OFtento”, a partir do e-mail da sua conta. Atendemos em até 15 dias.</li>
+  </ul>
+  <p>
+    Não são apagados por esse processo: a sua conta Google (ela é sua); os eventos que o app criou na sua Google
+    Agenda, a não ser que você marque essa opção ao excluir; e cópias temporárias nos registros dos provedores,
+    pelos prazos dos termos deles. Detalhes em <a href="/excluir-conta.html">Excluir sua conta</a>.
+  </p>
+
+  <h2>8. Seus direitos</h2>
+  <p>
+    Pela LGPD (art. 18), você pode pedir: confirmação de que tratamos seus dados, acesso, correção, anonimização,
+    bloqueio ou eliminação, portabilidade, informação sobre com quem os dados são compartilhados e revogação do
+    consentimento. Escreva para
+    <a href="mailto:viniciusgabriel109@gmail.com">viniciusgabriel109@gmail.com</a>. Você também pode
+    reclamar à Autoridade Nacional de Proteção de Dados (ANPD).
+  </p>
+
+  <h2>9. Idade mínima</h2>
+  <p>O OFtento é destinado a pessoas com 18 anos ou mais.</p>
+
+  <h2>10. Segurança</h2>
+  <p>
+    A comunicação é criptografada (HTTPS). As regras do banco de dados só deixam cada conta acessar os próprios
+    dados, e as chaves dos serviços de IA ficam no servidor, nunca no aplicativo. Como responsável técnico, o
+    desenvolvedor tem acesso administrativo ao banco de dados e só o usa quando necessário para suporte,
+    segurança ou para analisar uma denúncia.
+  </p>
+
+  <h2>11. Mudanças nesta política</h2>
+  <p>
+    Se algo importante mudar, atualizaremos esta página e a data no topo.
+  </p>
+
+  <h2>12. Contato</h2>
+  <p>Vinicius Vaz — <a href="mailto:viniciusgabriel109@gmail.com">viniciusgabriel109@gmail.com</a></p>
+</main>
+</body>
+</html>

@@ -2,11 +2,20 @@ import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Mic, MicOff, Send, CheckSquare, Calendar, ShieldAlert, Zap,
-  Sparkles, StickyNote, Clock, Check, Plus,
+  Sparkles, StickyNote, Clock, Check, Plus, Flag,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { chatWithAtento, transcribeAudio } from '../gemini';
 import { useAuth } from '../contexts/AuthContext';
+import ReportAiSheet from '../components/ReportAiSheet';
+
+// Junta tudo o que a IA gerou numa mensagem, para a denúncia levar o contexto inteiro
+const aiMessageText = (msg) => [
+  msg.text,
+  ...(msg.notes || []).map(n => `Nota: ${n.text}`),
+  ...(msg.alarms || []).map(a => `Alarme: ${a.text} (${a.date} ${a.time})`),
+  ...(msg.tasks || []).map(t => `Tarefa: ${t.text}${t.steps?.length ? ` — ${t.steps.join(' / ')}` : ''}`),
+].filter(Boolean).join('\n');
 
 const QUICK_ACTIONS = [
   { id: 'task',    icon: <CheckSquare size={18} />, label: 'Cadastrar tarefa' },
@@ -39,6 +48,7 @@ export default function IAScreen({ pendingTasks, energy, onAddTask, onAddAlarm, 
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [addedIds, setAddedIds] = useState({}); // sugestões já adicionadas
+  const [reportTarget, setReportTarget] = useState(null); // { feature, text } da resposta denunciada
   const messagesEndRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const streamRef = useRef(null);
@@ -377,6 +387,16 @@ export default function IAScreen({ pendingTasks, energy, onAddTask, onAddAlarm, 
                         );
                       })}
                     </div>
+                    <button
+                      onClick={() => setReportTarget({ feature: 'chat', text: aiMessageText(msg) })}
+                      aria-label="Denunciar esta resposta da IA"
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 4,
+                        marginTop: 4, padding: '4px 6px', fontSize: 12, color: 'var(--fg-dim)',
+                      }}
+                    >
+                      <Flag size={12} /> Denunciar resposta
+                    </button>
                   </div>
                 )}
               </motion.div>
@@ -432,6 +452,13 @@ export default function IAScreen({ pendingTasks, energy, onAddTask, onAddAlarm, 
           <Send size={18} />
         </button>
       </div>
+
+      <ReportAiSheet
+        open={!!reportTarget}
+        onClose={() => setReportTarget(null)}
+        feature={reportTarget?.feature}
+        aiText={reportTarget?.text}
+      />
     </div>
   );
 }
