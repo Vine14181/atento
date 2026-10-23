@@ -156,7 +156,9 @@ body {
 }
 
 /* ===================== BUTTONS ===================== */
-button { font-family: inherit; cursor: pointer; border: none; background: none; }
+/* color: inherit — sem isso o navegador pinta o texto de <button> com a cor
+   padrão do sistema (preto), e títulos sem cor própria somem no fundo escuro */
+button { font-family: inherit; color: inherit; cursor: pointer; border: none; background: none; }
 
 .btn-primary {
   background: var(--grad-primary);
