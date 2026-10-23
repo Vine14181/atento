@@ -1,0 +1,54 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.atento.app'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId "atento.vgp"
+        minSdk 26
+        targetSdk 36
+        // Cada envio à Play precisa de um versionCode maior que o anterior
+        versionCode 2
+        versionName "1.0.1"
+    }
+
+    signingConfigs {
+        release {
+            // As credenciais vêm do cofre do sistema via ambiente e não ficam no código.
+            def keyPath = System.getenv("OFTENTO_KEYSTORE_PATH")
+            def keyPass = System.getenv("OFTENTO_KEYSTORE_PASSWORD")
+            def alias = System.getenv("OFTENTO_KEY_ALIAS")
+            if (!keyPath || !keyPass || !alias) {
+                throw new GradleException("A chave de upload precisa ser carregada do cofre do sistema.")
+            }
+            storeFile file(keyPath)
+            storePassword keyPass
+            keyAlias alias
+            keyPassword keyPass
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+
+    lint {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.7.3'
+}

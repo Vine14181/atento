@@ -1,0 +1,11 @@
+# Saídas de build e configuração da máquina (caminho do SDK)
+.gradle/
+build/
+app/build/
+local.properties
+captures/
+
+# A chave de upload NUNCA entra no repositório (fica em ~/.local/share/oftento-play/)
+*.p12
+*.jks
+*.keystore

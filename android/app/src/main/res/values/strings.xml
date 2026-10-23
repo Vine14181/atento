@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">OFtento</string>
+    <string name="launch_url">https://atento-tan.vercel.app/</string>
+    <string name="launch_host">atento-tan.vercel.app</string>
+    <string name="asset_statements">
+        [{
+            \"relation\": [\"delegate_permission/common.handle_all_urls\"],
+            \"target\": {
+                \"namespace\": \"web\",
+                \"site\": \"https://atento-tan.vercel.app\"
+            }
+        }]
+    </string>
+</resources>
